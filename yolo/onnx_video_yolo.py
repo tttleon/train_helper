@@ -1,0 +1,210 @@
+import cv2
+import numpy as np
+import onnxruntime as ort
+import time
+
+
+# 初始化ONNX Runtime的GPU会话
+def create_onnx_session(model_path):
+    providers = [
+        ('CUDAExecutionProvider', {
+            'device_id': 0,
+            'arena_extend_strategy': 'kNextPowerOfTwo',
+            'gpu_mem_limit': 2 * 1024 * 1024 * 1024,  # 2GB
+            'cudnn_conv_algo_search': 'EXHAUSTIVE',
+            'do_copy_in_default_stream': True,
+        }),
+        'CPUExecutionProvider'
+    ]
+    session = ort.InferenceSession(model_path, providers=providers)
+    return session
+
+
+# 预处理函数
+def preprocess(img, input_size=(640, 640)):
+    h, w = img.shape[:2]
+    scale = min(input_size[0] / h, input_size[1] / w)
+    nh, nw = int(h * scale), int(w * scale)
+    top = (input_size[0] - nh) // 2
+    left = (input_size[1] - nw) // 2
+
+    # 缩放
+    resized = cv2.resize(img, (nw, nh), interpolation=cv2.INTER_LINEAR)
+    canvas = np.full((input_size[0], input_size[1], 3), 114, dtype=np.uint8)
+    canvas[top:top+nh, left:left+nw] = resized
+
+    # 转换格式
+    canvas = canvas.astype(np.float32) / 255.0
+    canvas = np.transpose(canvas, (2, 0, 1))
+    canvas = np.expand_dims(canvas, axis=0)
+
+    return canvas, (w, h), scale, top, left  # 👈 加了 top 和 left
+
+
+# 后处理函数 - 非极大值抑制
+def nms(boxes, scores, iou_threshold=0.45):
+    # 按置信度排序
+    order = scores.argsort()[::-1]
+    keep = []
+
+    while order.size > 0:
+        i = order[0]
+        keep.append(i)
+
+        # 计算IOU
+        xx1 = np.maximum(boxes[i, 0], boxes[order[1:], 0])
+        yy1 = np.maximum(boxes[i, 1], boxes[order[1:], 1])
+        xx2 = np.minimum(boxes[i, 2], boxes[order[1:], 2])
+        yy2 = np.minimum(boxes[i, 3], boxes[order[1:], 3])
+
+        w = np.maximum(0.0, xx2 - xx1)
+        h = np.maximum(0.0, yy2 - yy1)
+        intersection = w * h
+
+        area1 = (boxes[i, 2] - boxes[i, 0]) * (boxes[i, 3] - boxes[i, 1])
+        area2 = (boxes[order[1:], 2] - boxes[order[1:], 0]) * (boxes[order[1:], 3] - boxes[order[1:], 1])
+        union = area1 + area2 - intersection
+
+        iou = intersection / union
+
+        # 保留IOU小于阈值的框
+        inds = np.where(iou <= iou_threshold)[0]
+        order = order[inds + 1]
+
+    return keep
+
+
+# 后处理函数
+def postprocess(output, orig_shape, scale, top, left, conf_threshold=0.6, iou_threshold=0.45):
+    boxes = output[:, :4]
+    conf = output[:, 4:5]
+    cls_scores = output[:, 5:]
+
+    scores = conf * cls_scores
+    class_ids = np.argmax(scores, axis=1)
+    max_scores = np.max(scores, axis=1)
+
+    mask = max_scores > conf_threshold
+    boxes = boxes[mask]
+    scores = max_scores[mask]
+    class_ids = class_ids[mask]
+
+    if len(boxes) == 0:
+        return [], [], []
+
+    # 转换为 xyxy
+    boxes[:, 0] = boxes[:, 0] - boxes[:, 2] / 2
+    boxes[:, 1] = boxes[:, 1] - boxes[:, 3] / 2
+    boxes[:, 2] = boxes[:, 0] + boxes[:, 2]
+    boxes[:, 3] = boxes[:, 1] + boxes[:, 3]
+
+    # 👇 修复坐标偏移：减去填充，再除以缩放
+    boxes[:, [0, 2]] -= left
+    boxes[:, [1, 3]] -= top
+    boxes /= scale
+
+    boxes[:, [0, 2]] = np.clip(boxes[:, [0, 2]], 0, orig_shape[0])
+    boxes[:, [1, 3]] = np.clip(boxes[:, [1, 3]], 0, orig_shape[1])
+
+    keep = nms(boxes, scores, iou_threshold)
+    return boxes[keep], scores[keep], class_ids[keep]
+
+
+# 绘制结果
+def draw_detections(img, boxes, scores, class_ids, class_names):
+    color_map = {
+        0: (0, 255, 0),  # 绿色
+        1: (255, 0, 0),  # 蓝色
+        2: (0, 0, 255),  # 红色
+        3: (255, 255, 0),  # 青色
+        4: (255, 0, 255),  # 品红
+        5: (0, 255, 255),  # 黄色
+        6: (128, 0, 128),  # 紫色
+        7: (128, 128, 0),  # 橄榄色
+        8: (0, 128, 128),  # 青绿色
+        9: (128, 128, 128)  # 灰色
+    }
+
+    for box, score, class_id in zip(boxes, scores, class_ids):
+        x1, y1, x2, y2 = map(int, box)
+        color = color_map[class_id]
+
+        # 画框
+        cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
+
+        # 显示标签和置信度
+        label = f"{class_names[class_id]}: {score:.2f}"
+        cv2.putText(img, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+
+    return img
+
+
+# 主函数
+def main():
+    # 配置
+    model_path = r"E:\myJobTwo\project\yolov5-master\data\haitu-ningxia\exp_a\weights\best-no-fall-op12.onnx"  # 替换为你的模型路径
+    video_path = r"E:\work_important\ningxia_new\2025-08-13-17-31-29-2.mp4"  # 替换为你的视频路径
+    # class_names = ['box', 'ear', 'hook', 'hooked'] # 你的类别名称
+    # class_names = ['people', 'unwear', 'noglove', 'unhelmet', 'insulated_ladder', 'wear', 'helmet', 'glove']  # 你的类别名称
+    # class_names= ["people","fall","helmet","unhelmet","vest","novest","glove","no_glove","insulated_ladder","fire"]
+    class_names=  ['person','hat','head','reflectiveJacket',"hand","ladder",'glove','fall']
+    # 创建ONNX会话
+    session = create_onnx_session(model_path)
+
+    # 打开视频文件
+    cap = cv2.VideoCapture(video_path)
+
+    # 获取视频信息
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    # 创建输出视频
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter('output.mp4', fourcc, fps, (width, height))
+
+    # 处理每一帧
+    frame_count = 0
+    start_time = time.time()
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        # 预处理
+        input_tensor, orig_shape, scale, top, left = preprocess(frame)
+
+        # 推理
+        outputs = session.run(None, {session.get_inputs()[0].name: input_tensor})
+        output = outputs[0][0]  # 获取第一个输出(25200, 8)
+
+        # 后处理
+        boxes, scores, class_ids = postprocess(output, orig_shape, scale, top, left,conf_threshold=0.4)
+
+        # 绘制结果
+        result = draw_detections(frame, boxes, scores, class_ids, class_names)
+
+        # 显示处理后的帧
+        cv2.imshow('Detection', result)
+        out.write(result)
+
+        # 计算并显示FPS
+        frame_count += 1
+        if frame_count % 10 == 0:
+            elapsed = time.time() - start_time
+            fps = frame_count / elapsed
+            print(f"Processing FPS: {fps:.2f}")
+
+        # 按q退出
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # 释放资源
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,26 @@
+train:
+  - E:\dataSet\ymj_yolo_data\yolodata\person-hat-head\train\images
+  - E:\dataSet\ymj_yolo_data\yolodata\helmet-reflectiveJacket\train\images
+  - E:\dataSet\ymj_yolo_data\yolodata\hand\train\images
+  - E:\dataSet\ymj_yolo_data\yolodata\ladders-2\train-arg\images
+  - E:\dataSet\ymj_yolo_data\yolodata\copy_paste\hand_cp\images
+  - E:\dataSet\ymj_yolo_data\yolodata\copy_paste\reflectiveJacket_cp
+val:
+  - E:\dataSet\ymj_yolo_data\yolodata\person-hat-head\valid\images
+  - E:\dataSet\ymj_yolo_data\yolodata\helmet-reflectiveJacket\valid\images
+  - E:\dataSet\ymj_yolo_data\yolodata\hand\valid\images
+  - E:\dataSet\ymj_yolo_data\yolodata\ladders-2\valid-arg\images
+
+nc: 6
+names: ['person','hat','head','reflectiveJacket',"hand","ladder"]
+
+# python train.py --data data/haitu_5/haitu_5.yaml --batch-size 38 --device=0 --epoch=150 --weights yolov5s.pt --imgsz 640 --hyp data/hyps/hyp.scratch-med-custom.yaml
+
+
+
+# python detect.py --source E:\dataSet\ymj_yolo_data\yolodata\ladders-2\valid\images --weights weights/exp39_person_hat_head_7551_120epoch.pt --conf 0.6 --img-size 640 --save-txt
+
+# python export.py --weights data/haitu_5/exp12/weights/best.pt --img 640 --batch 1 --include onnx --opset 15
+# names: ['people','noglove', 'unhelmet', 'insulated_ladder', 'wear', 'helmet', 'glove']
+
+# person had hat ,hand ,ref, ladder
