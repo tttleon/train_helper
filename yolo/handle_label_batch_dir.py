@@ -61,7 +61,7 @@ def get_some_class_from_labels(label_dir,output_label_dir,need_class ):
 all_class = ["people","fall","helmet","unhelmet","vest","novest","glove","no_glove","insulated_ladder","fire"]
 
 # 自动打标模型中存在的类别，或者标签目录中已经存在的类别
-already_have_class = ['people','helmet','unhelmet','vest',"no_glove","insulated_ladder",'glove','fall']
+already_have_class = ['unhelmet', 'people', 'no_glove', 'insulated_ladder', 'unwear']
                    # ['person','hat','head','reflectiveJacket',"hand","ladder",'glove','fall']
 
 # 需要保留的类别

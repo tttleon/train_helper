@@ -62,7 +62,7 @@ def reorder_points_in_label(label_file):
             f.write(l + "\n")
 
 if __name__ == "__main__":
-    label_file = r"E:\dataSet\ocr\icon_test\ppocr_label\Label.txt"
+    label_file = r"E:\dataSet\ocr\mcc_icon\paddle_label_crop_oriented\Label.txt"
     # 如果备份文件已存在，则删除
     if os.path.exists(label_file + ".bak"):
         os.remove(label_file + ".bak")

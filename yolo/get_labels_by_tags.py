@@ -21,20 +21,19 @@ import os
 import shutil
 
 # 类别映射
-names = ['SafetyShoe', 'faceMask', 'goggle', 'helmet', 'no_faceMask', 'no_gloves',
-         'no_helmet', 'no_vest', 'object', 'person', 'vest']
+names = ['knife', 'pistol', 'rifle', 'stick']
 
 # 指定需要的类别
-target_classes = ['no_gloves']
+target_classes = ['stick']
 target_class_ids = [names.index(cls) for cls in target_classes]
 
 # 原始目录
-images_dir = r'E:\dataSet\ymj_yolo_data\yolodata\Safety_DS.v1i.yolov5pytorch\valid\images'
-labels_dir = r'E:\dataSet\ymj_yolo_data\yolodata\Safety_DS.v1i.yolov5pytorch\valid\labels'
+images_dir = r'E:\dataSet\ymj_yolo_data\yolodata\ARDS-knif-pisto-rifle-stick\train\images'
+labels_dir = r'E:\dataSet\ymj_yolo_data\yolodata\ARDS-knif-pisto-rifle-stick\train\labels'
 
 # 输出目录
-out_images_dir = r'E:\dataSet\ymj_yolo_data\yolodata\Safety_DS.v1i.yolov5pytorch\valid-filter\images'
-out_labels_dir = r'E:\dataSet\ymj_yolo_data\yolodata\Safety_DS.v1i.yolov5pytorch\valid-filter\labels'
+out_images_dir = r'E:\dataSet\ymj_yolo_data\yolodata\ARDS-knif-pisto-rifle-stick\only_stick\train\images'
+out_labels_dir = r'E:\dataSet\ymj_yolo_data\yolodata\ARDS-knif-pisto-rifle-stick\only_stick\train\labels'
 
 # 创建输出目录（如果不存在）
 os.makedirs(out_images_dir, exist_ok=True)

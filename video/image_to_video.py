@@ -41,6 +41,6 @@ def images_to_video(img_dir, out_path="output.mp4", fps=25):
 
 
 if __name__ == "__main__":
-    img_dir = r"E:\myJobTwo\project\yolov5-master\runs\detect\exp10"   # 修改为图片文件夹路径
+    img_dir = r"E:\myJobTwo\project\train-helper\paddle\ocr\server_TextDetection_output"   # 修改为图片文件夹路径
     out_path = "output.mp4"
-    images_to_video(img_dir, out_path, fps=3)
+    images_to_video(img_dir, out_path, fps=5)

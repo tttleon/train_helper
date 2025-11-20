@@ -25,7 +25,7 @@ def video_to_images(video_path, output_dir, frame_interval=30):
             break  # 视频结束
 
         if frame_count % frame_interval == 0:
-            image_path = os.path.join(output_dir, f"frame_{frame_count:06d}.jpg")
+            image_path = os.path.join(output_dir, f"32-frame_{frame_count:06d}.jpg")
             cv2.imwrite(image_path, frame)
             saved_count += 1
 
@@ -36,4 +36,4 @@ def video_to_images(video_path, output_dir, frame_interval=30):
 
 
 # 示例用法
-video_to_images(r"E:\myJobTwo\project\onnxruntime_yolo_c\cmake-build-debug-visual-studio\c.mp4", "./output_images", frame_interval=5)
+video_to_images(r"E:\视频制作\剪辑过的素材\00000001570000000.mp4_no_audio.mp4", "./output_images", frame_interval=10)

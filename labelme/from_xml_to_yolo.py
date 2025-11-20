@@ -6,10 +6,11 @@ import os
 import shutil
 import xml.etree.ElementTree as ET
 
-source_dir = r'E:\dataSet\ymj_yolo_data\yolodata\ladder-dianxin\labelme'
-target_dir = r'E:\dataSet\ymj_yolo_data\yolodata\ladder-dianxin\train'
+source_dir = r'C:\Users\leon\Downloads\抽烟手势'
+target_dir = r'C:\Users\leon\Downloads\抽烟手势-yolo'
 # class_names =  ['person','hat','head','reflectiveJacket',"hand","ladder",'fall']
-class_names =  ['insulated_ladder']
+# class_names =  ['box', 'ear', 'hook', 'hooked']
+class_names =  ['smoke']
 # 支持的图片扩展名
 img_exts = {".jpg", ".jpeg", ".png",".JPG", ".PNG", ".JPEG",'webp'}
 

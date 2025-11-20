@@ -19,10 +19,10 @@ python 删除yolo object detect的部分标签
 import os
 
 # 要处理的标签目录
-label_dir = r"E:\dataSet\ymj_yolo_data\yolodata\fall-haitu\train\labels_class_10"
+label_dir = r"E:\dataSet\ymj_yolo_data\yolodata\ladders-0909-gs\output_frames2\labels"
 
 # 需要删除的类别id（可以是多个）
-remove_ids = {6}  # 删除 class_id = 1 (即 b)
+remove_ids = {4}  # 删除 class_id = 1 (即 b)
 
 for file in os.listdir(label_dir):
     if not file.endswith(".txt"):

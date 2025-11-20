@@ -20,9 +20,6 @@ color_map = {
     9: (128, 128, 128)   # 灰色
 }
 
-
-
-
 def draw_and_save_image(img_path, label_path, output_path):
     """
     !!! 注意，路径里面不能存在中文字符，否则会报错
@@ -32,10 +29,11 @@ def draw_and_save_image(img_path, label_path, output_path):
     image = cv2.imread(img_path)
     height, width, _ = image.shape
     print(f'label_path={label_path}')
+
     if os.path.exists(label_path):
         with open(label_path, 'r') as f:
             lines = f.readlines()
-            for line in lines:
+            for line_idx, line in enumerate(lines):
                 parts = line.strip().split()
                 if len(parts) < 5:
                     continue  # skip malformed lines
@@ -47,10 +45,17 @@ def draw_and_save_image(img_path, label_path, output_path):
                 y = int((y_center - h / 2) * height)
                 w = int(w * width)
                 h = int(h * height)
+
                 # 动态计算字体大小
                 font_scale = max(0.5, min(2, w / 100))  # 根据宽度调整字体大小
+
+                # 绘制矩形框
                 cv2.rectangle(image, (x, y), (x + w, y + h), color_map[class_id], 4)
-                cv2.putText(image, f"{coco_class_name[class_id]}", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, font_scale, color_map[class_id], 2)
+
+                # 显示类别名称和行号
+                label_text = f"{coco_class_name[class_id]}(line:{line_idx+1})"
+                cv2.putText(image, label_text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                           font_scale, color_map[class_id], 2)
 
     # 保存结果图像
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -70,8 +75,8 @@ def process_random_images(img_dir, label_dir, output_dir, num_images=5):
         draw_and_save_image(img_path, label_path, output_path)
 
 # ==== 配置路径和数量 ====
-img_dir = r"E:\dataSet\ymj_yolo_data\yolodata\ARDS-knif-pisto-rifle-stick\only_stick\train\images"
-label_dir = r"E:\dataSet\ymj_yolo_data\yolodata\ARDS-knif-pisto-rifle-stick\only_stick\train\labels"
+img_dir = r"E:\dataSet\ymj_yolo_data\yolodata\smoke-gesture-yolo\valid\images"
+label_dir = r"E:\dataSet\ymj_yolo_data\yolodata\smoke-gesture-yolo\valid\labels_person_hat_head_smoking"
 output_dir = r"./out"
 # coco_class_name =['people', 'unwear', 'noglove', 'unhelmet', 'insulated_ladder', 'wear', 'helmet', 'glove'] # 替换为你的类别名称
 # coco_class_name = ['person','hat','head','reflectiveJacket',"hand","ladder",'glove','fall']
@@ -79,8 +84,8 @@ output_dir = r"./out"
 # coco_class_name = ['unhelmet', 'people', 'noglove', 'insulated_ladder', 'unwear']
 # coco_class_name = ['box', 'ear', 'hook', 'hooked']
 # coco_class_name = ['knife', 'rifle', 'gun', 'cigarette', 'alcohol']
-# coco_class_name = ['person','hat','head','smoking']
-coco_class_name = ['1']
+coco_class_name = ['person','hat','head','smoking']
+
 # 如果输出目录存在则删除
 if os.path.exists(output_dir):
     import shutil
@@ -88,5 +93,4 @@ if os.path.exists(output_dir):
     # 重新创建输出目录
     os.makedirs(output_dir)
 
-
-process_random_images(img_dir, label_dir, output_dir, num_images=100)
+process_random_images(img_dir, label_dir, output_dir, num_images=9999)

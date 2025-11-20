@@ -12,7 +12,7 @@ import os
 import xml.etree.ElementTree as ET
 from collections import Counter
 
-source_dir = r'E:\work_important\haiotu-yolo\20250815-labeled'
+source_dir = r'E:\work_important\ladder-0909-gs\output_frames2'
 
 class_counter = Counter()
 

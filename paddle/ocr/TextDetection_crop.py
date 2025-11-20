@@ -21,10 +21,11 @@ def process_output(output, save_dir):
         dt_polys = res["dt_polys"]  # 多组点
 
         # 过滤：如果某组有点不在ROI，则剔除
-        valid_polys = [poly for poly in dt_polys if polys_in_roi(poly, ROI)]
+        valid_polys = [poly for poly in dt_polys if polys_in_roi(poly, ROI) or polys_in_roi(poly, ROI_2)]
 
         if not valid_polys:
-            continue  # 没有符合ROI的点，跳过
+            print(f'{input_path}没有符合ROI的点，跳过')
+            continue  #
 
         # 计算剩余所有点的最大外接矩形
         all_points = np.vstack(valid_polys)
@@ -35,8 +36,7 @@ def process_output(output, save_dir):
         # 中心点
         cx, cy = x + w // 2, y + h // 2
 
-        # 裁剪区域大小
-        crop_size = 640
+
         half = crop_size // 2
 
         # 读取原图
@@ -68,11 +68,29 @@ def process_output(output, save_dir):
 if __name__ == "__main__":
     # os.chdir(r'E:\myJobTwo\project\PaddleOCR-3.2.0')
 
-    model = TextDetection(model_name="PP-OCRv5_mobile_det",
-                          model_dir='E:\myJobTwo\project\PaddleOCR-3.2.0\PP-OCRv5_mobile_det_infer')
-    output = model.predict(r"./1", batch_size=1)
+    model = TextDetection(model_name="PP-OCRv5_server_det",
+                          model_dir='E:\myJobTwo\project\PaddleOCR\PP-OCRv5_server_det_infer')
+    output = model.predict(r"E:\myJobTwo\project\train-helper\video\output_images",
+                           batch_size=1,
+                           limit_side_len=640,
+                           limit_type='min'
+                           )
+    for res in output:
+        res.save_to_img(save_path="./server_TextDetection_output/")
+
+
 
     # ROI 多边形
     ROI = np.array([[63, 129], [1913, 397], [1857, 810], [4, 542]])
+    ROI_2 = np.array([[7,616],[1730,4],[1914,161],[11,1064]])
+    # 裁剪区域大小
+    crop_size = 320
+    # 删除旧目录
+    if os.path.exists("crop_320_save_dir"):
+        import shutil
+        shutil.rmtree("crop_320_save_dir")
 
     process_output(output, "crop_320_save_dir")
+
+    # 打印crop_320_save_dir中文件数量
+    print(f'crop_320_save_dir中文件数量={len(os.listdir("crop_320_save_dir"))}')
