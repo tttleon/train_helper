@@ -3,7 +3,7 @@ import shutil
 import random
 
 # 基础路径
-base_dir = r"E:\dataSet\ymj_yolo_data\yolodata\ARDS-knif-pisto-rifle-stick\only_stick"
+base_dir = r"E:\dataSet\ymj_yolo_data\yolodata\ARDS-knif-pisto-rifle-stick"
 # 是否划分测试集
 is_split_test = False
 

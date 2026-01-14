@@ -32,15 +32,15 @@ from collections import defaultdict
 #   - E:\dataSet\ymj_yolo_data\yolodata\person-hat-head\valid\images
 
 labels_dirs =[
-    r'E:\dataSet\ymj_yolo_data\yolodata\smoke-gesture-yolo\train\labels',
+    r'E:\dataSet\ymj_yolo_data\yolodata\ARDS-knif-pisto-rifle-stick\train\labels-person-hat-head-labels-knif-pisto-rifle-stick',
     # r'E:\dataSet\ymj_yolo_data\yolodata\smoking-with-face\train\labels',
     # r'E:\dataSet\ymj_yolo_data\yolodata\person-hat-head\train\labels',
-    r'E:\dataSet\ymj_yolo_data\yolodata\person-hat-head\train_20\labels-person-hat-head'
+    # r'E:\dataSet\ymj_yolo_data\yolodata\person-hat-head\train_20\labels'
 ]
 
 # 所有类别（索引即为 class_id）
 # all_class = ["people","fall","helmet","unhelmet","vest","novest","glove","no_glove","insulated_ladder","fire"]
-all_class= ['person','hat','head','smoking']
+all_class= ['person','hat','head','knife', 'pistol', 'rifle', 'stick']
 
 # 初始化统计字典
 class_counts = defaultdict(int)

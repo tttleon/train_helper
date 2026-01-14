@@ -1,5 +1,7 @@
 import os
 
+from yolo.handle_label_batch_dir import already_have_class
+
 
 def get_some_class_from_labels(label_dir,output_label_dir,need_class ):
     """
@@ -59,20 +61,23 @@ def get_some_class_from_labels(label_dir,output_label_dir,need_class ):
 
 # 最终输出的类别
 # all_class = ["people","fall","helmet","unhelmet","vest","novest","glove","no_glove","insulated_ladder","fire"]
-all_class = ['person','hat','head','smoking']
+all_class = ['person','hat','head','knife', 'pistol', 'rifle', 'stick']
 # 自动打标模型中存在的类别，或者标签目录中已经存在的类别
 # already_have_class = ['fire','smoke','unhelmet','vest',"no_glove","insulated_ladder",'glove','fall']
                    # ['person','hat','head','reflectiveJacket',"hand","ladder",'glove','fall']
 # already_have_class = ['fire','s']
-already_have_class =  ['smoking']
-
+# already_have_class =  ['smoking']
+already_have_class =['knife', 'pistol', 'rifle', 'stick']
+# already_have_class = ['person','hat','head']
 # 需要保留的类别
-need_class =  ['smoking']
+need_class =  ['knife', 'pistol', 'rifle', 'stick']
+# need_class =  ['person','hat','head']
+
 # 已有标签目录
 # label_dir  = r'E:\myJobTwo\project\yolov5-master\runs\detect\exp20\labels'
-label_dir = r"E:\dataSet\ymj_yolo_data\yolodata\smoke-gesture-yolo\valid\labels-smoking__original"
+label_dir = r"E:\dataSet\ymj_yolo_data\yolodata\ARDSM-knif-pisto-rifle-stick\train\labels-knif-pisto-rifle-stick"
 # 输出新的标签目录
-output_label_dir = r'E:\dataSet\ymj_yolo_data\yolodata\smoke-gesture-yolo\valid\labels_person_hat_head_smoking'
+output_label_dir = r'E:\dataSet\ymj_yolo_data\yolodata\ARDSM-knif-pisto-rifle-stick\train\labels-person-hat-head-labels-knif-pisto-rifle-stick'
 # 确保输出目录存在
 os.makedirs(output_label_dir, exist_ok=True)
 

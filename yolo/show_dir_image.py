@@ -70,8 +70,8 @@ def process_random_images(img_dir, label_dir, output_dir, num_images=5):
         draw_and_save_image(img_path, label_path, output_path)
 
 # ==== 配置路径和数量 ====
-img_dir = r"E:\dataSet\ymj_yolo_data\yolodata\ARDS-knif-pisto-rifle-stick\only_stick\train\images"
-label_dir = r"E:\dataSet\ymj_yolo_data\yolodata\ARDS-knif-pisto-rifle-stick\only_stick\train\labels"
+img_dir = r"E:\dataSet\ymj_yolo_data\yolodata\smoke-gesture-yolo\train\images"
+label_dir = r"E:\dataSet\ymj_yolo_data\yolodata\smoke-gesture-yolo\train\labels_person_hat_head_smokingWithFace"
 output_dir = r"./out"
 # coco_class_name =['people', 'unwear', 'noglove', 'unhelmet', 'insulated_ladder', 'wear', 'helmet', 'glove'] # 替换为你的类别名称
 # coco_class_name = ['person','hat','head','reflectiveJacket',"hand","ladder",'glove','fall']
@@ -79,8 +79,8 @@ output_dir = r"./out"
 # coco_class_name = ['unhelmet', 'people', 'noglove', 'insulated_ladder', 'unwear']
 # coco_class_name = ['box', 'ear', 'hook', 'hooked']
 # coco_class_name = ['knife', 'rifle', 'gun', 'cigarette', 'alcohol']
-# coco_class_name = ['person','hat','head','smoking']
-coco_class_name = ['1']
+coco_class_name = ['person','hat','head','smoking']
+# coco_class_name = ['person','hat','head','knife', 'pistol', 'rifle', 'stick']
 # 如果输出目录存在则删除
 if os.path.exists(output_dir):
     import shutil
@@ -89,4 +89,4 @@ if os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 
-process_random_images(img_dir, label_dir, output_dir, num_images=100)
+process_random_images(img_dir, label_dir, output_dir, num_images=200)
